@@ -4,10 +4,21 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import inspect, text
 import os
+import sys
+if getattr(sys, "frozen", False):
+    # Running as a bundled app: place DB alongside the executable
+    app_path = os.path.dirname(os.path.realpath(sys.argv[0]))
+else:
+    # Running in development: place DB in project-level data directory
+    app_path = os.path.dirname(os.path.dirname(__file__))
+# Ensure data directory exists next to exe or project root
+data_dir = os.path.join(app_path, "data")
+os.makedirs(data_dir, exist_ok=True)
+# Database file path
+db_file = os.path.join(data_dir, "planner.db")
+
 
 # Database setup
-db_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'planner.db')
-print(f"Using database file: {db_file}")
 engine = create_engine(f'sqlite:///{db_file}', echo=False, connect_args={'check_same_thread': False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()

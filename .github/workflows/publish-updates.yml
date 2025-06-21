@@ -1,0 +1,72 @@
+name: Build & Publish Updates
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+        python: [3.11]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        persist-credentials: true
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python }}
+
+    - name: Create venv
+      shell: bash
+      run: |
+        python -m venv packaging-env
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        source packaging-env/bin/activate
+        pip install --upgrade pip
+        pip install -r requirements.txt pyinstaller pyupdater
+
+    - name: Build executable
+      shell: bash
+      run: |
+        source packaging-env/bin/activate
+        pyinstaller --name TeacherPlanner --onefile --windowed src/main.py
+
+    - name: Package updates
+      shell: bash
+      run: |
+        source packaging-env/bin/activate
+        pyupdater pkg --process
+
+    - name: Copy artifacts (macOS)
+      if: runner.os == 'macOS'
+      shell: bash
+      run: |
+        mkdir -p docs/updates
+        cp -r pyu-data/deploy/* docs/updates/
+
+    - name: Copy artifacts (Windows)
+      if: runner.os == 'Windows'
+      shell: powershell
+      run: |
+        New-Item -ItemType Directory -Force -Path docs\updates | Out-Null
+        Copy-Item -Path pyu-data\deploy\* -Destination docs\updates -Recurse -Force
+
+    - name: Commit & Push Updates
+      shell: bash
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add docs/updates/*
+        git commit -m "🔄 Release ${{ github.sha }}"
+        git push
+

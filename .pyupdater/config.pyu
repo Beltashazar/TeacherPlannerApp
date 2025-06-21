@@ -1,0 +1,20 @@
+{
+  "config_dir": "C:\\Users\\halom\\Documents\\TeacherPlannerApp\\.pyupdater",
+  "filename": "C:\\Users\\halom\\Documents\\TeacherPlannerApp\\.pyupdater\\config.pyu",
+  "count": 0,
+  "app_config": {
+    "APP_NAME": "TeacherPlannerApp",
+    "CLIENT_CONFIG_PATH": [
+      "client_config.py"
+    ],
+    "COMPANY_NAME": "John Doe Development",
+    "PLUGIN_CONFIGS": {},
+    "UPDATE_PATCHES": true,
+    "MAX_DOWNLOAD_RETRIES": 3,
+    "HTTP_TIMEOUT": 30,
+    "UPDATE_URLS": [
+      "https://github.com/Beltashazar/TeacherPlannerApp.git"
+    ],
+    "DATA_DIR": "C:\\Users\\halom\\Documents\\TeacherPlannerApp"
+  }
+}
